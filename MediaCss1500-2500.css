@@ -344,6 +344,8 @@ opacity: 0;
 	 flex: 1;
 	 transition: 2s;
 	 margin-bottom: 2%;
+	width: 400px;
+	 height: 250px;
 }
 
 .fancybox-thumbnails:hover {
