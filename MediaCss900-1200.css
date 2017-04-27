@@ -273,12 +273,14 @@
 	background: rgba(0, 0, 0, .8);
 }
 
+
 .fancybox-content {
-font-size: 32px;
-    font-weight: bold;
+	position: absolute;
+font-size: 24px;
+    /*font-weight: bold;*/
     flex: 1;
     /* align-self: flex-end; */
-     margin-top: 4%;
+     margin-top: 0%;
     display: flex;
     align-content: center;
     justify-content: center;
@@ -287,14 +289,26 @@ font-size: 32px;
     padding: 16px;
     background-color: black;
     border: 1px solid white;
-    line-height: 40px;
-    color: #E5C973;
+    line-height: 32px;
+    color: #fff;
 }
 
 .fancybox-content:hover *{
 	opacity: 1;
 	transition: 1s;
 
+}
+
+.fancybox-content-holder {
+	position: fixed;
+	width: 80%;
+	height: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 0 8px;
+	background-color: transparent;
+	top: 1px;
 }
 
 .fancybox-thumbnail-div {
@@ -304,7 +318,7 @@ font-size: 32px;
 *//*    margin-bottom: -45%;
 */    z-index: 8050;
     text-align: center;
-    margin-top: 8%;
+    margin-top: 2%;
     justify-content: center;
     align-items: center;
     flex-direction: column;
