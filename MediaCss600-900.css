@@ -273,12 +273,14 @@
 	background: rgba(0, 0, 0, .8);
 }
 
+
 .fancybox-content {
+	position: absolute;
 font-size: 24px;
-    font-weight: bold;
+    /*font-weight: bold;*/
     flex: 1;
     /* align-self: flex-end; */
-     margin-top: 2%;
+     margin-top: 0%;
     display: flex;
     align-content: center;
     justify-content: center;
@@ -288,13 +290,25 @@ font-size: 24px;
     background-color: black;
     border: 1px solid white;
     line-height: 32px;
-    color: #E5C973;
+    color: #fff;
 }
 
 .fancybox-content:hover *{
 	opacity: 1;
 	transition: 1s;
 
+}
+
+.fancybox-content-holder {
+	position: fixed;
+	width: 80%;
+	height: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 0 8px;
+	background-color: transparent;
+	top: 1px;
 }
 
 .fancybox-thumbnail-div {
