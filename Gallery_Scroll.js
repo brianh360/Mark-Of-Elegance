@@ -5,7 +5,14 @@ let container = document.querySelector('.container');
 let index = 0;
 let title = [];
 let thumb = [];
+let thumbTemp = [];
 let content = [];
+let thumbIndex = 1;
+let frustratingImageWeAreWorkingWith;
+let indexForHover = 0;
+let coordsX;
+let coordsY;
+let lastImageHovered;
 
 function openSlider (e) {
     e.preventDefault();
@@ -30,19 +37,34 @@ images.forEach((image, i) => {
     }
 });
 
-createDescription();
+// createDescription();
 
 // createThumbnailsDiv();
 // createThumbnails();
 
 }
 
+function debounce(func, wait = 250, immediate) {
+    var timeout;
+    return function() {
+        var context = this, args = arguments;
+        var later = function() {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+};
+
 function createOverlayBox () {
 
     const overlay = document.createElement('div');
     overlay.classList.add('fancybox-overlay', 'fancybox-overlay-fixed');
-    overlay.style.setProperty('width', `auto`);
-    overlay.style.setProperty('height', `auto`);
+    overlay.style.setProperty('width', `100%`);
+    overlay.style.setProperty('height', `1200px`);
     overlay.style.setProperty('display', `block`);
     document.body.appendChild(overlay);
     console.log('complete!');
@@ -58,6 +80,7 @@ console.log('Closing this overlay container!');
         document.body.removeChild(myDiv);
 
         thumb.splice(0, thumb.length + 1); //remove the images from the gallery before closing
+        thumbIndex = 0;
         console.log('All set!');
     }
 
@@ -135,20 +158,80 @@ function createFancyBoxInner () {
     }
 }
 
+// function openSliderImage (imagePos) {
+    
+//     let indexToUse = imagePos;
+    
+// if (indexToUse > linkedImages.length)
+//     {
+//         indexToUse = 1;
+//     }
+
+//     else if (indexToUse <= 0)
+//     {
+//         indexToUse = linkedImages.length;
+//     }
+
+
+//     linkedImages = linkedImages.map(imageLink => {
+//         if (imageLink.href == null)
+//             {
+//                 //try to open the link itself if the .href attribute no longer exists (I dont know why it disappears!)
+//                 return imageLink;
+//             }
+//         return imageLink.href;
+//     });
+
+//     //if an image is already open new image!
+//     if (document.querySelector('.fancybox-image'))
+//     {
+//         let imageToReplace = document.querySelector('.fancybox-image');
+
+//         //replace the title of the image
+//     if (document.querySelector('.child'))
+//     {
+//         let child = document.querySelector('.child');
+//         child.innerHTML = title[indexToUse - 1];
+
+//     }
+
+//         // console.log(title[indexToUse - 1]);
+//         imageToReplace.src = linkedImages[indexToUse - 1];
+//         index = indexToUse;
+//         currentIndex();
+//         // generateDescriptions();
+//         // generateThumbnails();
+//         return;
+//     }
+
+//     const imageToDisplay = document.createElement('img');
+//     imageToDisplay.classList.add('fancybox-image');
+//     //replace the title of the image
+//     if (document.querySelector('.child'))
+//     {
+//         let child = document.querySelector('.child');
+//         child.innerHTML = title[indexToUse - 1];
+
+//     }
+
+//     imageToDisplay.src = linkedImages[indexToUse - 1];
+
+//     if (document.querySelector('.fancybox-inner'))
+//     {
+//         let parentDiv = document.querySelector('.fancybox-inner');
+//         parentDiv.appendChild(imageToDisplay);
+//         generateThumbnails();
+//         // generateDescriptions();
+//         console.log('Success!');
+//     }
+// currentIndex();
+//     index = indexToUse;
+// }
+
 function openSliderImage (imagePos) {
-    
+    //imagePos is the position in the array of the image that the user has clicked
     let indexToUse = imagePos;
-    
-if (indexToUse > linkedImages.length)
-    {
-        indexToUse = 1;
-    }
-
-    else if (indexToUse <= 0)
-    {
-        indexToUse = linkedImages.length;
-    }
-
+    generateThumbnails();
 
     linkedImages = linkedImages.map(imageLink => {
         if (imageLink.href == null)
@@ -172,17 +255,17 @@ if (indexToUse > linkedImages.length)
 
     }
 
-        // console.log(title[indexToUse - 1]);
+        
         imageToReplace.src = linkedImages[indexToUse - 1];
+        frustratingImageWeAreWorkingWith = linkedImages[indexToUse - 1];
+        thumb.push(frustratingImageWeAreWorkingWith);
         index = indexToUse;
-        currentIndex();
-        generateDescriptions();
-        // generateThumbnails();
         return;
     }
 
     const imageToDisplay = document.createElement('img');
     imageToDisplay.classList.add('fancybox-image');
+
     //replace the title of the image
     if (document.querySelector('.child'))
     {
@@ -192,18 +275,26 @@ if (indexToUse > linkedImages.length)
     }
 
     imageToDisplay.src = linkedImages[indexToUse - 1];
+    if (imageToDisplay.src == "file://ontop.hq/")
+    {
+        closeOverlayBox();
+        return;
+    }
+    frustratingImageWeAreWorkingWith = linkedImages[indexToUse - 1];
+    thumb.unshift(frustratingImageWeAreWorkingWith);
 
     if (document.querySelector('.fancybox-inner'))
     {
         let parentDiv = document.querySelector('.fancybox-inner');
         parentDiv.appendChild(imageToDisplay);
-        generateThumbnails();
+        // generateThumbnails();
         // generateDescriptions();
         console.log('Success!');
     }
 currentIndex();
     index = indexToUse;
 }
+
 
 function generateThumbnails () {
 console.log(`thumbnail${index}`);
@@ -220,70 +311,132 @@ console.log(`thumbnail${index}`);
                 
                 });
                 thumb.splice(thumbnails.length - 1, 1);
-                createThumbnails();
+                // createThumbnails();
 
             } else {
 
-                removeThumbnails();
+                // removeThumbnails();
             }
             console.log(thumb);
     }
 }
 
-function generateDescriptions () {
-    if (document.querySelectorAll('[data-content]'))
+function slideAllUpInThatGallery(index) {
+    if (thumb.length == 1)return;
+thumbIndex += index;
+
+    console.log(thumbIndex);
+    console.log("Heres the thumbnails we will be working with " + thumb);
+
+
+if (thumbIndex > thumb.length)
     {
-        let descriptions = Array.from(document.querySelectorAll('[data-content]'));
-        
-            if (descriptions[index - 1] != null)
-            {
-                content.splice(0, descriptions.length + 1);
-
-                descriptions.forEach(bullshit => {
-                content.push(bullshit.dataset.content);
-                
-                });
-                removeDescription();
-                 createDescription();
-
-            } else {
-
-                 removeDescription();
-            }
-            console.log(content);
+        thumbIndex = 0;
     }
+
+    else if (thumbIndex < 0)
+    {
+        thumbIndex = thumb.length - 1;
+    }
+
+
+   //if an image is already open new image!
+    if (document.querySelector('.fancybox-image'))
+    {
+        let imageToReplace = document.querySelector('.fancybox-image');
+
+        if (thumbIndex == thumb.length) {
+            thumbIndex = 0;
+        }
+        imageToReplace.src = thumb[thumbIndex];
+    }
+
+
 }
 
+   function hoverDescriptionHolder () {
 
-function createDescription () {
-     console.log('Creating the Description for the slider');  
+ console.log('Creating the Description Holder');
 
+    const description = document.createElement('div');
+    description.classList.add('fancybox-content-holder');
 
-    const description = document.createElement('p');
-    description.classList.add('fancybox-content');
-
-    if (content[index -1] == null)
+    if (document.querySelector('.container'))
     {
-        return;
-    }
-
-    description.innerHTML = content[index -1];
-
-
-
-    if (document.querySelector('.fancybox-overlay'))
-    {
-        let parentDiv = document.querySelector('.fancybox-overlay');
+        let parentDiv = document.querySelector('.container');
         parentDiv.appendChild(description);
 
         console.log('Success!');
     }
-
-createThumbnailsDiv();
-generateThumbnails();
 }
 
+function removeDescriptionHolder () {
+
+    console.log('Removing the Description from the slider');
+
+if (document.querySelector('.fancybox-content-holder'))
+{
+    description = document.querySelector('.fancybox-content-holder');
+}
+if (!document.querySelector('.fancybox-content-holder'))
+{
+    return; //A description did not exist, cannot remove what doesn't exist
+}
+  
+    if (document.querySelector('.container'))
+    {
+        let parentDiv = document.querySelector('.container');
+        if (parentDiv.hasChildNodes())
+        parentDiv.removeChild(description);
+
+        console.log('Success!');
+    }
+}
+
+function hoverDescriptionCreater (e) {
+// if (this == lastImageHovered)return; //dont keep creating the same description bro
+
+coordsX = e.clientX;
+coordsY = e.clientY;
+
+    images.forEach((image, i) => {
+    if (image == this)
+    {
+        indexForHover = i; 
+    }
+});
+
+    console.log("ready to create description for " + (indexForHover - 1));
+    hoverDescriptionHolder();
+    createDescription();
+    lastImageHovered = this;
+}
+
+function createDescription () {
+     console.log('Creating the Description');
+
+    const description = document.createElement('p');
+    description.classList.add('fancybox-content');
+
+    if (content[indexForHover -1] == null)
+    {
+        return;
+    }
+
+    description.innerHTML = content[indexForHover -1];
+
+    if (document.querySelector('.fancybox-content-holder'))
+    {
+        let parentDiv = document.querySelector('.fancybox-content-holder');
+        parentDiv.appendChild(description);
+
+        console.log('Success!');
+    }
+}
+
+
 function removeDescription () {
+
     console.log('Removing the Description from the slider');
 
 if (document.querySelector('.fancybox-content'))
@@ -295,15 +448,89 @@ if (!document.querySelector('.fancybox-content'))
     return; //A description did not exist, cannot remove what doesn't exist
 }
   
-    if (document.querySelector('.fancybox-overlay'))
+    if (document.querySelector('.container'))
     {
-        let parentDiv = document.querySelector('.fancybox-overlay');
+        let parentDiv = document.querySelector('.container');
         if (parentDiv.hasChildNodes())
         parentDiv.removeChild(description);
 
         console.log('Success!');
     }
 }
+// function generateDescriptions () {
+//     if (document.querySelectorAll('[data-content]'))
+//     {
+//         let descriptions = Array.from(document.querySelectorAll('[data-content]'));
+        
+//             if (descriptions[index - 1] != null)
+//             {
+//                 content.splice(0, descriptions.length + 1);
+
+//                 descriptions.forEach(bullshit => {
+//                 content.push(bullshit.dataset.content);
+                
+//                 });
+//                 removeDescription();
+//                  createDescription();
+
+//             } else {
+
+//                  removeDescription();
+//             }
+//             console.log(content);
+//     }
+// }
+
+
+// function createDescription () {
+//      console.log('Creating the Description for the slider');  
+
+
+//     const description = document.createElement('p');
+//     description.classList.add('fancybox-content');
+
+//     if (content[index -1] == null)
+//     {
+//         return;
+//     }
+
+//     description.innerHTML = content[index -1];
+
+
+
+//     if (document.querySelector('.fancybox-overlay'))
+//     {
+//         let parentDiv = document.querySelector('.fancybox-overlay');
+//         parentDiv.appendChild(description);
+
+//         console.log('Success!');
+//     }
+
+// createThumbnailsDiv();
+// generateThumbnails();
+// }
+
+// function removeDescription () {
+//     console.log('Removing the Description from the slider');
+
+// if (document.querySelector('.fancybox-content'))
+// {
+//     description = document.querySelector('.fancybox-content');
+// }
+// if (!document.querySelector('.fancybox-content'))
+// {
+//     return; //A description did not exist, cannot remove what doesn't exist
+// }
+  
+//     if (document.querySelector('.fancybox-overlay'))
+//     {
+//         let parentDiv = document.querySelector('.fancybox-overlay');
+//         if (parentDiv.hasChildNodes())
+//         parentDiv.removeChild(description);
+
+//         console.log('Success!');
+//     }
+// }
 
 function createPrevSlide () {
     console.log('Creating the icon for the previous slide movement!');
@@ -405,50 +632,50 @@ function createThumbnailsDiv () {
     }
 }
 
-function createThumbnails () {
-     console.log('Creating the thumbnails for the slider');
- thumb.forEach(image => {
+// function createThumbnails () {
+//      console.log('Creating the thumbnails for the slider');
+//  thumb.forEach(image => {
 
-    const thumbIcon = document.createElement('img');
-    thumbIcon.classList.add('fancybox-thumbnails');
+//     const thumbIcon = document.createElement('img');
+//     thumbIcon.classList.add('fancybox-thumbnails');
    
-        thumbIcon.src = image;
+//         thumbIcon.src = image;
 
-    if (document.querySelector('.fancybox-thumbnail-div'))
-    {
-        let parentDiv = document.querySelector('.fancybox-thumbnail-div');
-        parentDiv.appendChild(thumbIcon);
+//     if (document.querySelector('.fancybox-thumbnail-div'))
+//     {
+//         let parentDiv = document.querySelector('.fancybox-thumbnail-div');
+//         parentDiv.appendChild(thumbIcon);
 
-        console.log('Success!');
-    }
-    });
-}
+//         console.log('Success!');
+//     }
+//     });
+// }
 
-function removeThumbnails () {
-    console.log('Removing the thumbnails from the slider');
+// function removeThumbnails () {
+//     console.log('Removing the thumbnails from the slider');
 
-  thumb.forEach(image => {
+//   thumb.forEach(image => {
 
-if (document.querySelector('.fancybox-thumbnails'))
-{
-    thumbIcon = document.querySelector('.fancybox-thumbnails');
-}
+// if (document.querySelector('.fancybox-thumbnails'))
+// {
+//     thumbIcon = document.querySelector('.fancybox-thumbnails');
+// }
   
-    if (document.querySelector('.fancybox-thumbnail-div'))
-    {
-        let parentDiv = document.querySelector('.fancybox-thumbnail-div');
-        if (parentDiv.hasChildNodes())
-        parentDiv.removeChild(thumbIcon);
+//     if (document.querySelector('.fancybox-thumbnail-div'))
+//     {
+//         let parentDiv = document.querySelector('.fancybox-thumbnail-div');
+//         if (parentDiv.hasChildNodes())
+//         parentDiv.removeChild(thumbIcon);
 
-        console.log('Success!');
-    }
-    });
+//         console.log('Success!');
+//     }
+//     });
 
-  if (thumb.length) 
-  {
-  thumb.splice(0, thumb.length + 1);
-    }
-}
+//   if (thumb.length) 
+//   {
+//   thumb.splice(0, thumb.length + 1);
+//     }
+// }
 
 
 function currentIndex () {
@@ -471,6 +698,17 @@ function currentIndex () {
         }
         return bs.dataset.content;
    });
+
+
+
+/* Event Listeners are here! */
+
+//handles clicking outside of the fancybox, closes the fancybox
+
+images.forEach(img => img.addEventListener('mouseover', hoverDescriptionCreater));
+
+images.forEach(img => img.addEventListener('mouseout', removeDescriptionHolder));
+
 
 
 /* Event Listeners are here! */
@@ -529,7 +767,7 @@ document.addEventListener('click', (e) => {
             if (e.target == prev || e.target == icon)
             {
                 index--;
-                openSliderImage(index);
+                slideAllUpInThatGallery(-1);
                 
             }    
         }           
@@ -548,7 +786,7 @@ document.addEventListener('keydown', (e) => {
             if (e.keyCode == 37)
             {
                 index--;
-                openSliderImage(index);
+                slideAllUpInThatGallery(-1);
                 
             }    
         }           
@@ -567,7 +805,7 @@ document.addEventListener('keydown', (e) => {
             if (e.keyCode == 40)
             {
                 index--;
-                openSliderImage(index);
+                slideAllUpInThatGallery(-1);
                 
             }    
         }           
@@ -589,7 +827,7 @@ document.addEventListener('click', (e) => {
             if (e.target == next || e.target == icon)
             {
                 index++;
-            openSliderImage(index);
+            slideAllUpInThatGallery(1);
 
 
             }    
@@ -609,7 +847,7 @@ document.addEventListener('keydown', (e) => {
             if (e.keyCode == 39)
             {
                 index++;
-                openSliderImage(index);
+                slideAllUpInThatGallery(1);
                 
             }    
         }           
@@ -628,7 +866,7 @@ document.addEventListener('keydown', (e) => {
             if (e.keyCode == 38)
             {
                 index++;
-                openSliderImage(index);
+                slideAllUpInThatGallery(1);
                 
             }    
         }           
@@ -665,3 +903,4 @@ Make old html sites great again
             ^.^ 
 
 */
+
